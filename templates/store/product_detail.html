@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - IoT Hub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" class="img-fluid rounded mb-4" alt="{{ product.name }}">
+            {% else %}
+                <div class="bg-light rounded d-flex align-items-center justify-content-center mb-4" style="height: 300px;">
+                    <i class="fas fa-microchip text-muted" style="font-size: 4rem;"></i>
+                </div>
+            {% endif %}
+            
+            <h1 class="fw-bold mb-3">{{ product.name }}</h1>
+            <p class="lead mb-4">{{ product.description }}</p>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="price mb-3">${{ product.price }}</div>
+                    
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2">
+                            <i class="fas fa-tag text-primary me-2"></i>
+                            <strong>Category:</strong> {{ product.get_category_display }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-boxes text-primary me-2"></i>
+                            <strong>Stock:</strong> 
+                            {% if product.is_in_stock %}
+                                <span class="text-success">{{ product.stock_quantity }} available</span>
+                            {% else %}
+                                <span class="text-danger">Out of stock</span>
+                            {% endif %}
+                        </li>
+                    </ul>
+                    
+                    {% if user.is_authenticated %}
+                        {% if product.is_in_stock %}
+                            <a href="{% url 'store:add_to_cart' 'product' product.pk %}" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-cart-plus me-2"></i>Add to Cart
+                            </a>
+                        {% else %}
+                            <button class="btn btn-secondary btn-lg w-100" disabled>
+                                Out of Stock
+                            </button>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn btn-primary btn-lg w-100">
+                            Login to Purchase
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.title }} - IoT Hub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            {% if course.image %}
+                <img src="{{ course.image.url }}" class="img-fluid rounded mb-4" alt="{{ course.title }}">
+            {% else %}
+                <div class="bg-light rounded d-flex align-items-center justify-content-center mb-4" style="height: 300px;">
+                    <i class="fas fa-book text-muted" style="font-size: 4rem;"></i>
+                </div>
+            {% endif %}
+            
+            <h1 class="fw-bold mb-3">{{ course.title }}</h1>
+            <p class="lead mb-4">{{ course.description }}</p>
+            
+            {% if lessons %}
+                <h3 class="fw-bold mb-3">Course Lessons</h3>
+                <div class="list-group mb-4">
+                    {% for lesson in lessons %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ lesson.order }}. {{ lesson.title }}</h6>
+                            </div>
+                            {% if lesson.description %}
+                                <p class="mb-1 text-muted">{{ lesson.description }}</p>
+                            {% endif %}
+                            <div class="mt-2">
+                                {% if lesson.video_file %}
+                                    <span class="badge bg-primary me-2"><i class="fas fa-video me-1"></i>Video</span>
+                                {% endif %}
+                                {% if lesson.pdf_file %}
+                                    <span class="badge bg-success me-2"><i class="fas fa-file-pdf me-1"></i>PDF</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="price mb-3">${{ course.price }}</div>
+                    
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2">
+                            <i class="fas fa-user text-primary me-2"></i>
+                            <strong>Instructor:</strong> {{ course.instructor }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-clock text-primary me-2"></i>
+                            <strong>Duration:</strong> {{ course.duration }} hours
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-signal text-primary me-2"></i>
+                            <strong>Level:</strong> {{ course.get_difficulty_display }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-list text-primary me-2"></i>
+                            <strong>Lessons:</strong> {{ lessons.count }}
+                        </li>
+                    </ul>
+                    
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'store:add_to_cart' 'course' course.pk %}" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-cart-plus me-2"></i>Add to Cart
+                        </a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn btn-primary btn-lg w-100">
+                            Login to Purchase
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

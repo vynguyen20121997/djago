@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Shopping Cart - IoT Hub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="fw-bold mb-4">Shopping Cart</h1>
+    
+    {% if cart_items %}
+        <div class="row">
+            <div class="col-lg-8">
+                {% for item in cart_items %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-2">
+                                    {% if item.get_item.image %}
+                                        <img src="{{ item.get_item.image.url }}" class="img-fluid rounded" alt="{{ item.get_item }}">
+                                    {% else %}
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 80px;">
+                                            {% if item.item_type == 'course' %}
+                                                <i class="fas fa-book text-muted"></i>
+                                            {% else %}
+                                                <i class="fas fa-microchip text-muted"></i>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <h6 class="card-title">{{ item.get_item }}</h6>
+                                    <p class="text-muted mb-0">
+                                        {% if item.item_type == 'course' %}
+                                            Course
+                                        {% else %}
+                                            {{ item.product.get_category_display }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="col-md-2">
+                                    {% if item.item_type == 'product' %}
+                                        <form method="post" action="{% url 'store:update_cart_quantity' item.pk %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock_quantity }}" class="form-control form-control-sm" style="width: 80px;" onchange="this.form.submit()">
+                                        </form>
+                                    {% else %}
+                                        <span class="fw-bold">1</span>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="fw-bold">${{ item.get_total_price }}</span>
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    <a href="{% url 'store:remove_from_cart' item.pk %}" class="btn btn-outline-danger btn-sm">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Order Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Items ({{ cart.total_items }}):</span>
+                            <span>${{ cart.total_price }}</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <strong>Total:</strong>
+                            <strong class="price">${{ cart.total_price }}</strong>
+                        </div>
+                        <a href="{% url 'orders:checkout' %}" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-credit-card me-2"></i>Proceed to Checkout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-shopping-cart text-muted" style="font-size: 4rem;"></i>
+            <h3 class="mt-3">Your cart is empty</h3>
+            <p class="text-muted">Start shopping to add items to your cart</p>
+            <a href="{% url 'store:home' %}" class="btn btn-primary">Continue Shopping</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

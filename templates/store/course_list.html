@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Courses - IoT Hub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Filters</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get">
+                        <div class="mb-3">
+                            <label for="q" class="form-label">Search</label>
+                            <input type="text" class="form-control" name="q" value="{{ query }}" placeholder="Search courses...">
+                        </div>
+                        <div class="mb-3">
+                            <label for="difficulty" class="form-label">Difficulty</label>
+                            <select name="difficulty" class="form-select">
+                                <option value="">All Levels</option>
+                                <option value="beginner" {% if difficulty == 'beginner' %}selected{% endif %}>Beginner</option>
+                                <option value="intermediate" {% if difficulty == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                                <option value="advanced" {% if difficulty == 'advanced' %}selected{% endif %}>Advanced</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="fw-bold">Courses</h1>
+                <span class="text-muted">{{ courses.paginator.count }} course{{ courses.paginator.count|pluralize }}</span>
+            </div>
+            
+            <div class="row">
+                {% for course in courses %}
+                    <div class="col-lg-6 mb-4">
+                        <div class="card h-100">
+                            {% if course.image %}
+                                <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }}" style="height: 200px; object-fit: cover;">
+                            {% else %}
+                                <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 200px;">
+                                    <i class="fas fa-book text-muted" style="font-size: 3rem;"></i>
+                                </div>
+                            {% endif %}
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">{{ course.title }}</h5>
+                                <p class="card-text text-muted">{{ course.description|truncatewords:20 }}</p>
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="price">${{ course.price }}</span>
+                                        <span class="badge badge-custom">{{ course.difficulty|capfirst }}</span>
+                                    </div>
+                                    <p class="text-muted mb-2">
+                                        <i class="fas fa-user me-1"></i>{{ course.instructor }} • 
+                                        <i class="fas fa-clock me-1"></i>{{ course.duration }}h
+                                    </p>
+                                    <a href="{{ course.get_absolute_url }}" class="btn btn-primary w-100">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12 text-center">
+                        <p class="text-muted">No courses found matching your criteria.</p>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if courses.has_other_pages %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if courses.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if difficulty %}&difficulty={{ difficulty }}{% endif %}">&laquo; First</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ courses.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if difficulty %}&difficulty={{ difficulty }}{% endif %}">Previous</a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">{{ courses.number }} of {{ courses.paginator.num_pages }}</span>
+                        </li>
+                        
+                        {% if courses.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ courses.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if difficulty %}&difficulty={{ difficulty }}{% endif %}">Next</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ courses.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if difficulty %}&difficulty={{ difficulty }}{% endif %}">Last &raquo;</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
